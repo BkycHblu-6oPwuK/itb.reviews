@@ -354,40 +354,4 @@ window.addEventListener('DOMContentLoaded', () => {
             },
         }
     })
-
-    new window.swiper.Swiper('.swiper-reviews-slider', {
-        modules: [window.swiper.modules.Navigation],
-        slidesPerView: 2.5,
-        spaceBetween: 6,
-        navigation: {
-            nextEl: '.js-slider-next-reviews',
-            prevEl: '.js-slider-prev-reviews',
-        },
-        breakpoints: {
-            390: {
-                slidesPerView: 3.8,
-            },
-            767: {
-                slidesPerView: 6.2,
-            },
-            992: {
-                slidesPerView: 7.3,
-            },
-            1280: {
-                slidesPerView: 4.38,
-            },
-            1300:{
-                slidesPerView: 5.35,
-            },
-            1600:{
-                slidesPerView: 9.35,
-            },
-            1921: {
-                slidesPerView: 10.5,
-            },
-            2500: {
-                slidesPerView: 12,
-            }
-        }
-    });
 })

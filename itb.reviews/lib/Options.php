@@ -18,8 +18,7 @@ final class Options
     private $sorting_type = "DESC";
 
     private $limitFiles = 20;
-    private $limitSearchProduct = 5;
-    private $showFilesByProduct = false;
+    private $showFilesByProduct = true;
     private static $instance = null;
     
     private function __construct(array $arParams)
@@ -110,11 +109,6 @@ final class Options
     public function getLimitFiles()
     {
         return $this->limitFiles;
-    }
-
-    public function getLimitSearchProduct()
-    {
-        return $this->limitSearchProduct;
     }
 
     public function getShowFilesByProduct()

@@ -377,7 +377,6 @@ window.addEventListener('DOMContentLoaded', () => {
                         if(!this.user_authorize){
                             isValid = !noValid.includes('user_name') ? this.validateText(false, "user_name", 'Введите ваше имя') && isValid : isValid;
                         }
-                       // isValid = !noValid.includes('rules') ? this.validateRules() && isValid : isValid;
                         return isValid;
                     },
                     validateText(noCheck = false, field, text, notify = false) {

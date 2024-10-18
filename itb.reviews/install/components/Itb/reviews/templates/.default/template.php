@@ -1,12 +1,5 @@
 <?php
-
-use Bitrix\Main\Page\Asset;
-use Bitrix\Main\UI\Extension;
 use Bitrix\Main\Web\Json;
-Extension::load([
-    'itb.reviews'
-]);
-Asset::getInstance()->addString('<script type="module" src="/bitrix/js/itb/reviews/dist/export_swiper.js"></script>');
 ?>
 <div id="vue-reviews">
     <p id="reviews-title" class="item-slider__title <?= !$arResult['isset_items'] ? 'mod__empty-items' : '' ?>"><?= $arResult['isset_items'] ? 'Отзывы о товаре' : 'Отзывов пока нет' ?></p>

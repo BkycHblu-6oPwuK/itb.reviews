@@ -47,6 +47,12 @@
 </script>
 
 <?
+use Bitrix\Main\Page\Asset;
+use Bitrix\Main\UI\Extension;
+Extension::load([
+    'itb.reviews'
+]);
+Asset::getInstance()->addString('<script type="module" src="/bitrix/js/itb/reviews/dist/export_swiper.js"></script>');
 include_once 'reviews_items_template.php';
 include_once 'reviews_right_template.php';
 include_once 'reviews_pagination_template.php';

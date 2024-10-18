@@ -1,6 +1,0 @@
-<?
-$sSectionName = "reviews";
-$arDirProperties = Array(
-
-);
-?>

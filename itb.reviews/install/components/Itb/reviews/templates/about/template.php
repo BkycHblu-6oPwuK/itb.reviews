@@ -1,12 +1,5 @@
 <?php
-
-use Bitrix\Main\Page\Asset;
-use Bitrix\Main\UI\Extension;
 use Bitrix\Main\Web\Json;
-Extension::load([
-    'itb.reviews'
-]);
-Asset::getInstance()->addString('<script type="module" src="/bitrix/js/itb/reviews/dist/export_swiper.js"></script>');
 ?>
 
 <div class="reviews-block" id="vue-reviews">

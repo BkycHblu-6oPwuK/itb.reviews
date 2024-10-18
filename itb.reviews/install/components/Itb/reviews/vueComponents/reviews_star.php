@@ -1,7 +1,3 @@
-<?php
-use Bitrix\Main\UI\Extension;
-Extension::load(['itb.vue2_6']);
-?>
 <script type="text/x-template" id="vue-product-detail-reviews-star-template">
   <div class="stars-items">
         <div v-for="i in 5" :key="i" class="star-container">

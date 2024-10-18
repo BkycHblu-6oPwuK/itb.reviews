@@ -21,16 +21,6 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="false" class="button-container">
-                    <button class="b-slider__btn b-slider__btn-next mod-no-sm js-slider-next-reviews swiper-button-next" type="button">
-                            <img class="img-active" src="/images/arrow.svg">
-                            <img class="img-no-active" src="/images/arrow-no-active.svg">
-                    </button>
-                    <button class="b-slider__btn b-slider__btn-prev mod-no-sm js-slider-prev-reviews swiper-button-prev" type="button">
-                        <img class="img-active" src="/images/arrow.svg">
-                        <img class="img-no-active" src="/images/arrow-no-active.svg">
-                    </button>
-                </div>
 
                 <div class="sort-reviews">
                     <div>Сортировка по:</div>
@@ -69,6 +59,12 @@
 </script>
 
 <?
+use Bitrix\Main\Page\Asset;
+use Bitrix\Main\UI\Extension;
+Extension::load([
+    'itb.reviews'
+]);
+Asset::getInstance()->addString('<script type="module" src="/bitrix/js/itb/reviews/dist/export_swiper.js"></script>');
 include_once 'reviews_items_template.php';
 include_once 'reviews_right_template.php';
 include_once 'reviews_pagination_template.php';

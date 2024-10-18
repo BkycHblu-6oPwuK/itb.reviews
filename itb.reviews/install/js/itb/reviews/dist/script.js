@@ -10,7 +10,6 @@ class Popup {
         this.init();
     }
 
-    // Инициализация событий
     init() {
         this.closeBtn.addEventListener("click", () => this.close());
         this.buttons.forEach(button => {
@@ -19,21 +18,18 @@ class Popup {
         this.popup.addEventListener("click", (e) => this.eventPopupClick(e));
     }
 
-    // Метод открытия попапа
     open() {
         this.popup.classList.add("mod-show");
         this.html.classList.add("mod-popup-is-open");
         this.body.classList.add("mod-popup-is-open");
     }
 
-    // Метод закрытия попапа
     close() {
         this.popup.classList.remove("mod-show");
         this.html.classList.remove("mod-popup-is-open");
         this.body.classList.remove("mod-popup-is-open");
     }
 
-    // Закрытие попапа при клике по фону
     //eventPopupClick(e) {
     //    if (e.target === this.popup) {
     //        this.close();
@@ -60,7 +56,6 @@ class PopupManager {
         }
     }
 
-    // Инициализация попапов
     initPopups() {
         const popups = document.querySelectorAll(".js-popup");
         popups.forEach(popup => {
@@ -68,10 +63,9 @@ class PopupManager {
         });
     }
 
-    // Метод для повторной инициализации попапов
     reinitialize() {
-        this.popups = {}; // Очищаем старые попапы
-        this.initPopups(); // Инициализируем заново
+        this.popups = {};
+        this.initPopups();
     }
 }
 

@@ -6,7 +6,6 @@ use Bitrix\Iblock\Elements\ElementProductReviewsApiTable;
 use Bitrix\Main\FileTable;
 use Bitrix\Main\Loader;
 use Bitrix\Main\ORM\Fields\ExpressionField;
-use Oneway\User\User;
 use Itb\Reviews\Resources\Elements;
 use Itb\Reviews\Resources\Files;
 use Itb\Reviews\Resources\FilesForElements;
@@ -83,7 +82,8 @@ class ReviewsTable extends ElementProductReviewsApiTable
 
     public static function reviewsExistsByCurrentUserAndProductId(string|int $productId): bool
     {
-        $userId = User::current()->getId();
+        global $USER;
+        $userId = $USER->GetID();
         if (empty($userId)) {
             return false;
         }
@@ -113,8 +113,6 @@ class ReviewsTable extends ElementProductReviewsApiTable
         }
 
         $select = [
-            'NAME',
-            'IBLOCK_ID1' => 'IBLOCK.ID',
             'ID',
             'DATE_CREATE',
             'OFFER_ID' => 'OFFER.VALUE',

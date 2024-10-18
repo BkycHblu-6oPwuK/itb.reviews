@@ -1,0 +1,15 @@
+{
+    "extra": {
+      "bitrix-dir": "bitrix"
+    },
+    "require": {
+      "tightenco/collect": "*",
+      "php-ffmpeg/php-ffmpeg": "^1.2"
+    },
+    "config": {
+      "allow-plugins": {
+        "composer/installers": true
+      }
+    }
+  }
+  

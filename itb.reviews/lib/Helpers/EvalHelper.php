@@ -7,18 +7,18 @@ use Itb\Reviews\Models\ReviewsTable;
 
 class EvalHelper 
 {
-    public static function getAvg($id)
+    public static function getAvg(int $productId)
     {
-        $reviewsEvalCollect = static::getReviewsEvalCollect($id);
+        $reviewsEvalCollect = static::getReviewsEvalCollect($productId);
         return round($reviewsEvalCollect->avg('EVAL_VALUE'), 2);
     }
 
-    public static function getReviewsEvalCollect($id)
+    public static function getReviewsEvalCollect(int $productId) 
     {
         static $collect = null;
         if($collect === null){
             $collect = collect(ElementProductReviewsApiTable::query()
-            ->where('PRODUCT_VALUE', $id)
+            ->where('PRODUCT_VALUE', $productId)
             ->where('ACTIVE','Y')
             ->setSelect(['PRODUCT_' => 'PRODUCT','EVAL_' =>'EVAL'])
             ->fetchAll());
@@ -26,7 +26,7 @@ class EvalHelper
         return $collect;
     }
 
-    public static function getEvalInfo(string|int $productId)
+    public static function getEvalInfo(int $productId)
     {
         $allReviewsCount = ReviewsTable::getCountReviews($productId);
         $reviewsEvalCollect = EvalHelper::getReviewsEvalCollect($productId);

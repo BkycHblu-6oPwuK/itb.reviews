@@ -1,6 +1,8 @@
 <?php
 namespace Itb\Reviews;
 
+use Itb\Reviews\Exceptions\CatalogIblockIdIsEmpty;
+
 final class Options 
 {
     const MODULE_ID = 'itb.reviews';
@@ -28,7 +30,7 @@ final class Options
         $this->product_id = (int)$arParams['PRODUCT_ID'] ?? 0;
         $this->pagination_limit = (int)$arParams['PAGINATION_LIMIT'] ?? 5;
         $this->showInfoByProduct = (bool)$arParams['SHOW_INFO_PRODUCT'] ?? false;
-        if(empty($moduleOptions['catalog_iblock_id'])) throw new \Exception("Должна быть заполнена настройка модуля - ID инфоблока каталога");
+        if(empty($moduleOptions['catalog_iblock_id'])) throw new CatalogIblockIdIsEmpty("Должна быть заполнена настройка модуля - ID инфоблока каталога");
         $this->catalogIblockId = $moduleOptions['catalog_iblock_id'] ? (int)$moduleOptions['catalog_iblock_id'] : 0;
         $this->offerIblockId = $moduleOptions['offers_iblock_id'] ? (int)$moduleOptions['offers_iblock_id'] : 0;
     }
@@ -38,6 +40,9 @@ final class Options
         return $this->iblockId;
     }
 
+    /**
+     * @throws CatalogIblockIdIsEmpty
+     */
     public static function createInstance(array $arParams) : self
     {
         self::$instance = new self($arParams);
@@ -45,15 +50,10 @@ final class Options
     }
 
     /**
-     * Возвращает объект, если он уже был создан, или создает объект используя массив arParams
-     * @throws Exception
+     * Возвращает объект, если он уже был создан, или null
      */
-    public static function getInstance(?array $arParams) : self
+    public static function getInstance() : ?self
     {   
-        if(self::$instance === null){
-            if(!$arParams) throw new \Exception("arParams должен быть массивом");
-            self::createInstance($arParams);
-        }
         return self::$instance;
     }
 

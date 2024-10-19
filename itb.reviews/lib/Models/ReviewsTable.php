@@ -19,7 +19,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
         return self::class;
     }
 
-    public static function getCountReviews(string|int $productId)
+    public static function getCountReviews(int $productId)
     {
         static $count = 0;
         if (!$count) {
@@ -67,7 +67,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
         return $query;
     }
 
-    public static function getFiles(string|int $productId, int $limit)
+    public static function getFiles(int $productId, int $limit)
     {
         $files = self::addFileToQuery(self::query()
             ->setSelect(['ID'])
@@ -80,7 +80,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
         return Files::make(compact('files'))->toArray();
     }
 
-    public static function reviewsExistsByCurrentUserAndProductId(string|int $productId): bool
+    public static function reviewsExistsByCurrentUserAndProductId(int $productId): bool
     {
         global $USER;
         $userId = $USER->GetID();
@@ -99,7 +99,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
         return !empty($element['ID']);
     }
 
-    public static function getElements(string|int $productId, array $sorting, array $pagination, bool $getInfoByProduct)
+    public static function getElements(int $productId, array $sorting, array $pagination, bool $getInfoByProduct)
     {
         $nav = new \Bitrix\Main\UI\PageNavigation("nav-reviews");
         $nav->allowAllRecords(true)

@@ -15,7 +15,6 @@ class ReviewsService
 
     public function __construct(Options $options)
     {
-        if(!Loader::includeModule('itb.core')) throw new \Exception("Должен быть установлен модуль itb.core");
         $this->options = $options;
     }
 
@@ -114,7 +113,7 @@ class ReviewsService
         return $arSaveFiles;
     }
 
-    private function addThumbnail(string|int $id_file)
+    private function addThumbnail(int $id_file)
     {
         $path = tempnam(sys_get_temp_dir(), "img") . '.jpg';
         $videoPath = $_SERVER['DOCUMENT_ROOT']. \CFile::GetPath($id_file);

@@ -18,7 +18,6 @@ if ($POST_RIGHT < "S") {
 }
 
 Loader::includeModule($module_id);
-Loader::includeModule('itb.core');
 Loader::includeModule('iblock');
 $iblocks = IblockTable::query()->where('ACTIVE','Y')->setSelect(['ID','NAME','CODE'])->exec()->fetchAll();
 $optionsIblock = [];

@@ -27,10 +27,12 @@ final class Options
     {
         $moduleOptions = \Bitrix\Main\Config\Option::getForModule(self::MODULE_ID);
         $this->iblockId = $arParams['IBLOCK_ID'] ? (int)$arParams['IBLOCK_ID'] : (int)$moduleOptions['reviews_iblock_id'];
-        $this->product_id = (int)$arParams['PRODUCT_ID'] ?? 0;
-        $this->pagination_limit = (int)$arParams['PAGINATION_LIMIT'] ?? 5;
-        $this->showInfoByProduct = (bool)$arParams['SHOW_INFO_PRODUCT'] ?? false;
+        $this->product_id = $arParams['PRODUCT_ID'] ? (int)$arParams['PRODUCT_ID'] : 0;
+        $this->pagination_limit = $arParams['PAGINATION_LIMIT'] ? (int)$arParams['PAGINATION_LIMIT'] : 5;
+        $this->showInfoByProduct = $arParams['SHOW_INFO_PRODUCT'] ? (bool)$arParams['SHOW_INFO_PRODUCT'] : false;
+
         if(empty($moduleOptions['catalog_iblock_id'])) throw new CatalogIblockIdIsEmpty("Должна быть заполнена настройка модуля - ID инфоблока каталога");
+        
         $this->catalogIblockId = $moduleOptions['catalog_iblock_id'] ? (int)$moduleOptions['catalog_iblock_id'] : 0;
         $this->offerIblockId = $moduleOptions['offers_iblock_id'] ? (int)$moduleOptions['offers_iblock_id'] : 0;
     }

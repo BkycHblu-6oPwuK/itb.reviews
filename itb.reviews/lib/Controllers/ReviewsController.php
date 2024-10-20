@@ -17,7 +17,7 @@ class ReviewsController extends BaseController
 
     public function addAction($form)
     {
-        return $this->service->add($form);
+        return $this->service->add($form, $_FILES['files'] ?? []);
     }
 
     public function paginationAction($pagination, $sorting)

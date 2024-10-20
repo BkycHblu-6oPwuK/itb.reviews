@@ -38,18 +38,7 @@ class ReviewsService
         return $elements;
     }
 
-    protected function getActions()
-    {
-        $urlManager = \Bitrix\Main\Engine\UrlManager::getInstance();
-        return [
-            'pagination' => $urlManager->create('itb:reviews.ReviewsController.pagination'),
-            'add' => $urlManager->create('itb:reviews.ReviewsController.add'),
-            'sorting' => $urlManager->create('itb:reviews.ReviewsController.sorting'),
-            'get' => $urlManager->create('itb:reviews.ReviewsController.get'),
-        ];
-    }
-
-    public function getReviewsByProduct(string|int $productId)
+    public function getReviewsByProduct(int $productId)
     {
         global $USER;
         $elements = $this->getElements($productId);
@@ -68,7 +57,7 @@ class ReviewsService
         return $elements;
     }
 
-    public function getElements(string|int $productId)
+    public function getElements(int $productId)
     {
         return ReviewsTable::getElements($productId, $this->options->getSorting(), $this->options->getPagination(), $this->options->getShowInfoProduct());
     }
@@ -93,7 +82,18 @@ class ReviewsService
         ];
     }
 
-    public function uploadFiles(array $files)
+    protected function getActions()
+    {
+        $urlManager = \Bitrix\Main\Engine\UrlManager::getInstance();
+        return [
+            'pagination' => $urlManager->create('itb:reviews.ReviewsController.pagination'),
+            'add' => $urlManager->create('itb:reviews.ReviewsController.add'),
+            'sorting' => $urlManager->create('itb:reviews.ReviewsController.sorting'),
+            'get' => $urlManager->create('itb:reviews.ReviewsController.get'),
+        ];
+    }
+
+    protected function uploadFiles(array $files)
     {
         $toSavefiles = FilesHelper::getFormattedToSafe($files);
         $arSaveFiles = [];
@@ -113,7 +113,7 @@ class ReviewsService
         return $arSaveFiles;
     }
 
-    private function addThumbnail(int $id_file)
+    protected function addThumbnail(int $id_file)
     {
         $path = tempnam(sys_get_temp_dir(), "img") . '.jpg';
         $videoPath = $_SERVER['DOCUMENT_ROOT']. \CFile::GetPath($id_file);
@@ -124,20 +124,24 @@ class ReviewsService
         return $path;
     }
 
-    public function add($form)
+    /**
+     * @param string $form is json from array{eval: int, review: string, contact: string, user_name: string, offer: int}
+     * @param array $files from $_FILES
+     */
+    public function add($form, array $files)
     {
         global $USER;
         Loader::includeModule('iblock');
         $form = Json::decode($form);
-        $files = [];
+        $uploadResult = [];
 
-        if(isset($_FILES['files'])) $files = $this->uploadFiles($_FILES['files']);
+        if(!empty($files)) $uploadResult = $this->uploadFiles($files);
 
         $property = [
             'PRODUCT' => $this->options->getProductId(),
             'EVAL' => $form['eval'],
             'REVIEW' => $form['review'],
-            'FILES' => $files['ids'],
+            'FILES' => $uploadResult['ids'],
             'OFFER' => $form['offer'],
             'CONTACT_DETAILS' => $form['contact']
         ];
@@ -165,15 +169,19 @@ class ReviewsService
             'PROPERTY_VALUES' => $property
         ];
 
-        if($files['preview']) $data['PREVIEW_PICTURE'] = $files['preview']['file_array'];
+        if($uploadResult['preview']) $data['PREVIEW_PICTURE'] = $uploadResult['preview']['file_array'];
 
         $id = (new \CIBlockElement)->Add($data);
 
-        if($files['preview']['thumbnail_path']) unlink($files['preview']['thumbnail_path']);
+        if($uploadResult['preview']['thumbnail_path']) unlink($uploadResult['preview']['thumbnail_path']);
 
         return $id;
     }
 
+    /**
+     * @param string $pagination is json
+     * @param string $sorting is json
+     */
     public function sorting($sorting, $pagination): array
     {
         $result = [];
@@ -189,6 +197,10 @@ class ReviewsService
         return $result;
     }
 
+    /**
+     * @param string $pagination is json
+     * @param string $sorting is json
+     */
     public function pagination($pagination, $sorting): array
     {
         $result = [];

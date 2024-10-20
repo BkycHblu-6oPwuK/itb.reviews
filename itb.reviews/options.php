@@ -31,7 +31,7 @@ foreach($iblocks as $iblock){
 }
 
 $mainTab = new Tab('edit1', 'Общие настройки', 'Отзывы');
-$mainTab->addField((new Select('reviews_iblock_id', 'Инфоблок', $optionsIblock))->setDefaultValue($selectedIblock)->isDisabled()->setLabel('Общие'));
+$mainTab->addField((new Select('reviews_iblock_id', 'Инфоблок', $optionsIblock))->setDefaultValue($selectedIblock)->setLabel('Общие'));
 $mainTab->addField((new Input('catalog_iblock_id', 'ID инфоблока каталога'))->setDefaultValue(0));
 $mainTab->addField((new Input('offers_iblock_id', 'ID инфоблока предложений'))->setDefaultValue(0));
 $accessTab = new Tab("edit2", Loc::getMessage("MAIN_TAB_RIGHTS"), Loc::getMessage("MAIN_TAB_TITLE_RIGHTS"));

@@ -12,14 +12,6 @@
                             </button>
                         </div>
                     </div>
-                    <div v-if="false && product_sizes.length > 0" class="form__row input">
-                        <label>Размер продукта</label>
-                        <div class="mod-with-text select">
-                            <select v-model="form.offer">
-                                <option v-for="size in product_sizes" :value="size.offerId">{{size.size}}</option>
-                            </select>
-                        </div>
-                    </div>
                     <div v-if="!user_authorize" class="form__row input">
                         <label for="review_name">Ваше имя *</label>
                         <div :class="validationErrors.user_name != null ? 'mod-error' : ''" :data-error="validationErrors.user_name" class="input__container mod-with-text">

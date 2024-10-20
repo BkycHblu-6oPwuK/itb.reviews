@@ -20,7 +20,7 @@ final class Options
     private $sorting_type = "DESC";
 
     private $limitFiles = 20;
-    private $showFilesByProduct = true;
+    private $showFilesByProduct = false;
     private static $instance = null;
     
     private function __construct(array $arParams)

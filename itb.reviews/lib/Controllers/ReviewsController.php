@@ -12,6 +12,21 @@ class ReviewsController extends BaseController
                     new Csrf,
                 ],
             ],
+            'pagination' => [
+                'prefilters' => [
+                    new Csrf,
+                ],
+            ],
+            'sorting' => [
+                'prefilters' => [
+                    new Csrf,
+                ],
+            ],
+            'get' => [
+                'prefilters' => [
+                    new Csrf,
+                ],
+            ],
         ];
     }
 

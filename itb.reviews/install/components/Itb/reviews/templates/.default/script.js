@@ -13,6 +13,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     let formData = new URLSearchParams();
                     formData.append('params', JSON.stringify(this.params));
                     formData.append('product_id', productId);
+                    formData.append('sessid', BX.message('bitrix_sessid'));
                     const response = await fetch(this.actions.get, {
                         method: "POST",
                         headers: {
@@ -44,6 +45,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     formData.append('params', JSON.stringify(this.params));
                     formData.append('sorting', JSON.stringify(this.sorting_map));
                     formData.append('pagination', JSON.stringify(this.pagination));
+                    formData.append('sessid', BX.message('bitrix_sessid'));
                     const response = await fetch(this.actions.sorting, {
                         method: "POST",
                         headers: {
@@ -91,6 +93,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     formData.append('params', JSON.stringify(this.params));
                     formData.append('pagination', JSON.stringify(this.pagination));
                     formData.append('sorting', JSON.stringify(this.sorting_map));
+                    formData.append('sessid', BX.message('bitrix_sessid'));
                     const response = await fetch(this.actions.pagination, {
                         method: "POST",
                         headers: {
@@ -448,5 +451,5 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    window.store._actions.updateReviews = reviewsApp.updateReviews
+    window.reviewsApp = reviewsApp
 })

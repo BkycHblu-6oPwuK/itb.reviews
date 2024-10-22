@@ -1,6 +1,6 @@
 window.addEventListener('DOMContentLoaded', () => {
     const reviews = window.ITB.Reviews;
-    new Vue({
+    const reviewsApp = new Vue({
         el: "#vue-reviews",
         template: '#vue-reviews-template',
         data() {
@@ -14,6 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     formData.append('params', JSON.stringify(this.params));
                     formData.append('sorting', JSON.stringify(this.sorting_map));
                     formData.append('pagination', JSON.stringify(this.pagination));
+                    formData.append('sessid', BX.message('bitrix_sessid'));
                     const response = await fetch(this.actions.sorting, {
                         method: "POST",
                         headers: {
@@ -61,6 +62,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     formData.append('params', JSON.stringify(this.params));
                     formData.append('pagination', JSON.stringify(this.pagination));
                     formData.append('sorting', JSON.stringify(this.sorting_map));
+                    formData.append('sessid', BX.message('bitrix_sessid'));
                     const response = await fetch(this.actions.pagination, {
                         method: "POST",
                         headers: {
@@ -354,4 +356,5 @@ window.addEventListener('DOMContentLoaded', () => {
             },
         }
     })
+    window.reviewsApp = reviewsApp
 })

@@ -61,7 +61,7 @@ class Elements extends Resource
     {
         $options = Options::getInstance();
         $catalogApi = Iblock::wakeUp($options->getCatalogIblockId())->getEntityDataClass();
-        if(!$catalogApi) throw new Exception("Не заполнен символьный код инфоблока каталог товаров");
+        if(!$catalogApi) throw new Exception("Не заполнен символьный код API инфоблока каталог товаров");
         $result = new Collection($catalogApi::query()
         ->setSelect([
             'ID',

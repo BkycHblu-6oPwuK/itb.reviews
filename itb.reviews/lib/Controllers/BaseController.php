@@ -8,7 +8,7 @@ use Itb\Reviews\Services\ReviewsService;
 
 abstract class BaseController extends Controller
 {
-    /** @var Itb\Reviews\Services\ReviewsService $service */
+    /** @var \Itb\Reviews\Services\ReviewsService $service */
     protected $service;
 
     public function __construct(Request $request = null)

@@ -515,7 +515,7 @@ body .reviews-slider-block .slick-initialized .slick-slide {
 
 .img-container__type-video::after {
     content: "";
-    background: url(/images/play.svg) center center no-repeat;
+    background: url(/images/reviews/play.svg) center center no-repeat;
     position: absolute;
     background-size: contain;
     width: 40px;

@@ -53,7 +53,7 @@
                     </div>
                     <div v-if="review.store_response" class="store-response-btn" :class="{active:showResponse}" @click="showResponse = !showResponse">
                         <span>Ответ магазина</span>
-                        <img class="no__active" src="/images/arrow_rev.svg" alt="">
+                        <img class="no__active" src="/images/reviews/arrow_rev.svg" alt="">
                     </div>
                     <div v-if="showResponse" class="store-response" v-html="review.store_response"></div>
                 </div>

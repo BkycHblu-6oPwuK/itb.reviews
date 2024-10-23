@@ -8,7 +8,7 @@
                         <label for="eval_review">Ваша оценка *</label>
                         <div class="input__container-eval input__container mod-with-text">
                             <button v-for="star in 5" :key="star" :class="{'selected': star <= form.eval}" @click="setRating(star)">
-                                <img :src="star <= form.eval ? '/images/Star.svg' : '/images/Star-no.svg'" alt="Star" />
+                                <img :src="star <= form.eval ? '/images/reviews/Star.svg' : '/images/reviews/Star-no.svg'" alt="Star" />
                             </button>
                         </div>
                     </div>

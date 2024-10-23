@@ -309,7 +309,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     getImageUrl(file) {
                         let url;
                         if(file.type.startsWith('video')){
-                            url = '/images/video_camera.png';
+                            url = '/images/reviews/video_camera.png';
                         } else {
                             url = URL.createObjectURL(file);
                         }

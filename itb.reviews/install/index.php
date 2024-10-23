@@ -86,7 +86,7 @@ class itb_reviews extends CModule
         );
         CopyDirFiles(
             __DIR__ . "/images",
-            Application::getDocumentRoot() . "/images",
+            Application::getDocumentRoot() . "/images/reviews",
             true,
             true
         );

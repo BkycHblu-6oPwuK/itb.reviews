@@ -39,9 +39,9 @@ use Bitrix\Main\Web\Json;
                                         <?
                                         for ($i = 1; $i <= 5; $i++) :
                                             if ($item['eval'] >= $i) {
-                                                echo '<img src="/images/Star.svg">';
+                                                echo '<img src="/images/reviews/Star.svg">';
                                             } else {
-                                                echo '<img src="/images/Star-no.svg">';
+                                                echo '<img src="/images/reviews/Star-no.svg">';
                                             }
                                         endfor;
                                         ?>

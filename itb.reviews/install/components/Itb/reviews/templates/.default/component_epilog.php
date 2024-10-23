@@ -26,13 +26,13 @@
                     <div>Сортировка по:</div>
                     <div class="sort-button sort__date" :class="{active:this.sorting_map.field == 'ID'}" @click="selectSorting('ID')">
                         <span>Дата</span>
-                        <img class="no__active" v-if="this.sorting_map.field != 'ID'" src="/images/arrow_rev.svg" alt="">
-                        <img class="active" :class="{sort_asc:this.sorting_map.field == 'ID' && this.sorting_map.type == 'ASC'}" v-if="this.sorting_map.field == 'ID'" src="/images/arrow_rev_active.svg" alt="">
+                        <img class="no__active" v-if="this.sorting_map.field != 'ID'" src="/images/reviews/arrow_rev.svg" alt="">
+                        <img class="active" :class="{sort_asc:this.sorting_map.field == 'ID' && this.sorting_map.type == 'ASC'}" v-if="this.sorting_map.field == 'ID'" src="/images/reviews/arrow_rev_active.svg" alt="">
                     </div>
                     <div class="sort-button sort__eval" :class="{active:this.sorting_map.field == 'EVAL_VALUE'}" @click="selectSorting('EVAL_VALUE')">
                         <span>Оценка</span>
-                        <img class="no__active" v-if="this.sorting_map.field != 'EVAL_VALUE'" src="/images/arrow_rev.svg" alt="">
-                        <img class="active" :class="{sort_asc:this.sorting_map.field == 'EVAL_VALUE' && this.sorting_map.type == 'ASC'}" v-if="this.sorting_map.field == 'EVAL_VALUE'" src="/images/arrow_rev_active.svg" alt="">
+                        <img class="no__active" v-if="this.sorting_map.field != 'EVAL_VALUE'" src="/images/reviews/arrow_rev.svg" alt="">
+                        <img class="active" :class="{sort_asc:this.sorting_map.field == 'EVAL_VALUE' && this.sorting_map.type == 'ASC'}" v-if="this.sorting_map.field == 'EVAL_VALUE'" src="/images/reviews/arrow_rev_active.svg" alt="">
                     </div>
                 </div>
 

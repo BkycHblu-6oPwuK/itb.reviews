@@ -1,15 +1,16 @@
 {
-    "extra": {
-      "bitrix-dir": "bitrix"
-    },
-    "require": {
-      "tightenco/collect": "*",
-      "php-ffmpeg/php-ffmpeg": "^1.2"
-    },
-    "config": {
-      "allow-plugins": {
-        "composer/installers": true
-      }
+  "extra": {
+    "bitrix-dir": "bitrix"
+  },
+  "require": {
+    "php": "~8.2.0",
+    "php-ffmpeg/php-ffmpeg": "^1.2",
+    "illuminate/support": "^11.29",
+    "symfony/var-dumper": "^7.1"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
     }
   }
-  
+}

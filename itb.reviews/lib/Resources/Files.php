@@ -3,7 +3,7 @@
 namespace Itb\Reviews\Resources;
 
 use Itb\Core\Http\Resources\Resource;
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 
 class Files extends Resource
 {

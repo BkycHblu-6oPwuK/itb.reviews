@@ -8,7 +8,7 @@ use Itb\Core\Http\Resources\Resource;
 use Itb\Core\Helpers\DateHelper;
 use Itb\Reviews\Models\ReviewsTable;
 use Itb\Reviews\Options;
-use Tightenco\Collect\Support\Collection;
+use Illuminate\Support\Collection;
 
 class Elements extends Resource
 {

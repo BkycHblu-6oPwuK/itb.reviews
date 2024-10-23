@@ -225,6 +225,7 @@ class itb_reviews extends CModule
     {
         DeleteDirFilesEx("/bitrix/components/Itb/reviews");
         DeleteDirFilesEx("/bitrix/js/itb/reviews");
+        DeleteDirFilesEx("/images/reviews");
         Option::delete($this->MODULE_ID);
     }
 }

@@ -17,7 +17,7 @@ abstract class BaseController extends Controller
         $params = $this->request->get('params') ?? [];
         $product_id = (int)$this->request->get('product_id');
         if(!empty($params)){
-            $params = unserialize(base64_decode($params));
+            $params = unserialize(base64_decode($params), ['allowed_classes' => false]);
         }
         if(!empty($product_id)){
             $params['PRODUCT_ID'] = $product_id;

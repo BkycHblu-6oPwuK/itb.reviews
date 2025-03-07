@@ -24,7 +24,7 @@ class itb_reviews extends CModule
             $this->MODULE_VERSION_DATE = $arModuleVersion['VERSION_DATE'];
             $this->MODULE_NAME         = Loc::getMessage('REVIEWS_NAME');
             $this->MODULE_DESCRIPTION  = Loc::getMessage('REVIEWS_DESCRIPTION');
-            $this->PARTNER_NAME = 'Itb';
+            $this->PARTNER_NAME = 'itb';
             $this->PARTNER_URI = '#';
         } else {
             CAdminMessage::showMessage(
@@ -223,7 +223,7 @@ class itb_reviews extends CModule
 
     public function uninstallFiles()
     {
-        DeleteDirFilesEx("/bitrix/components/Itb/reviews");
+        DeleteDirFilesEx("/bitrix/components/itb/reviews");
         DeleteDirFilesEx("/bitrix/js/itb/reviews");
         DeleteDirFilesEx("/images/reviews");
         Option::delete($this->MODULE_ID);

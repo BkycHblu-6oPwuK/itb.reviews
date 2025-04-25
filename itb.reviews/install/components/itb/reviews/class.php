@@ -32,7 +32,8 @@ class Reviews extends \CBitrixComponent
             'PAGINATION_LIMIT',
             'PRODUCT_ID',
             'IBLOCK_ID',
-            'SHOW_INFO_PRODUCT'
+            'SHOW_INFO_PRODUCT',
+            'PLATFORM'
         ];
     }
 }

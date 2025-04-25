@@ -403,7 +403,6 @@ window.addEventListener('DOMContentLoaded', () => {
                         let isValid = true;
                         if (!this.form.rules) {
                             this.$set(this.validationErrors, 'rules', 'Необходимо ваше согласие');
-                            console.log(this.validationErrors)
                             isValid = false;
                         } else {
                             this.$set(this.validationErrors, 'rules', null);

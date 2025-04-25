@@ -1,6 +1,9 @@
 <?php
+
 namespace Itb\Reviews\Controllers;
+
 use Bitrix\Main\Engine\ActionFilter\Csrf;
+use Bitrix\Main\Web\Json;
 
 class ReviewsController extends BaseController
 {
@@ -32,21 +35,33 @@ class ReviewsController extends BaseController
 
     public function addAction($form)
     {
-        return $this->service->add($form, $_FILES['files'] ?? []);
+        try {
+            return $this->service->add(Json::decode($form), $_FILES['files'] ?? []);
+        } catch (\Exception $e) {
+        }
     }
 
     public function paginationAction($pagination, $sorting)
     {
-        return $this->service->pagination($pagination, $sorting);
+        try {
+            return $this->service->pagination(Json::decode($pagination), Json::decode($sorting));
+        } catch (\Exception $e) {
+        }
     }
 
     public function sortingAction($sorting, $pagination)
     {
-        return $this->service->sorting($sorting, $pagination);
+        try {
+            return $this->service->sorting(Json::decode($sorting), Json::decode($pagination));
+        } catch (\Exception $e) {
+        }
     }
-    
+
     public function getAction()
     {
-        return $this->service->getReviews();
+        try {
+            return $this->service->getReviews();
+        } catch (\Exception $e) {
+        }
     }
 }

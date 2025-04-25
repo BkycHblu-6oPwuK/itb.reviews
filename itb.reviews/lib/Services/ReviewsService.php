@@ -1,65 +1,75 @@
 <?php
+
 namespace Itb\Reviews\Services;
 
-use Bitrix\Main\Loader;
-use Bitrix\Main\Web\Json;
-use Itb\Core\Helpers\FilesHelper;
+use Bitrix\Main\DI\ServiceLocator;
 use Itb\Core\Helpers\PaginationHelper;
+use Itb\Reviews\Contracts\CreatorContract;
 use Itb\Reviews\Helpers\EvalHelper;
 use Itb\Reviews\Models\ReviewsTable;
 use Itb\Reviews\Options;
 
-class ReviewsService 
+class ReviewsService
 {
     protected Options $options;
+    protected bool $isImport;
 
-    public function __construct(Options $options)
+    public function __construct(Options $options, bool $isImport = false)
     {
         $this->options = $options;
+        $this->isImport = $isImport;
     }
 
-    public function getReviews()
+    public function getReviews(): array
     {
         $productId = $this->options->getProductId();
-        $this->options->setPaginationPageCount(ceil(ReviewsTable::getCountReviews($productId) / $this->options->getPaginationLimit()));
-        if($productId){
+
+        $this->updatePaginationCount($productId);
+
+        if ($productId > 0) {
             return $this->getReviewsByProduct($productId);
         }
+
+        return $this->buildReviewsData(0, false);
+    }
+
+    public function getReviewsByProduct(int $productId): array
+    {
+        return $this->buildReviewsData($productId, true);
+    }
+
+    protected function buildReviewsData(int $productId, bool $withEvalAndFiles): array
+    {
         global $USER;
+
         $elements = $this->getElements($productId);
         $elements['isset_items'] = !empty($elements['items']);
         $elements['actions'] = $this->getActions();
         $elements['exits_review'] = false;
-
-        $elements['user_authorize'] = $USER->IsAuthorized();
+        $elements['user_authorize'] = $USER?->IsAuthorized() ?? false;
         $elements['pagination'] = $this->getPagination();
         $elements['sorting'] = $this->getSorting();
+
+        if ($withEvalAndFiles) {
+            $elements['eval_info'] = EvalHelper::getEvalInfo($productId);
+            $elements['files'] = $this->options->getShowFilesByProduct()
+                ? ReviewsTable::getFiles($productId, $this->options->getLimitFiles())
+                : [];
+        }
 
         return $elements;
     }
 
-    public function getReviewsByProduct(int $productId)
+    protected function updatePaginationCount(int $productId): void
     {
-        global $USER;
-        $elements = $this->getElements($productId);
-        $elements['isset_items'] = !empty($elements['items']);
-        $elements['eval_info'] = EvalHelper::getEvalInfo($productId);
-        $elements['files'] = $this->options->getShowFilesByProduct() ? ReviewsTable::getFiles($productId, $this->options->getLimitFiles()) : [];
-
-        $elements['actions'] = $this->getActions();
-
-        $elements['exits_review'] = false;
-        $elements['user_authorize'] = $USER->IsAuthorized();
-        
-        $elements['pagination'] = $this->getPagination();
-        $elements['sorting'] = $this->getSorting();
-
-        return $elements;
+        $count = ReviewsTable::getCountReviews($productId);
+        $limit = $this->options->getPaginationLimit();
+        $this->options->setPaginationPageCount(ceil($count / $limit));
     }
 
     public function getElements(int $productId)
     {
-        return ReviewsTable::getElements($productId, $this->options->getSorting(), $this->options->getPagination(), $this->options->getShowInfoProduct());
+        return ReviewsTable::getElements($productId, $this->options->getSorting(), $this->options->getPagination(), $this->options->getShowInfoProduct(), $this->options->getPlatform());
     }
 
     protected function getPagination()
@@ -93,126 +103,34 @@ class ReviewsService
         ];
     }
 
-    protected function uploadFiles(array $files)
+    public function add(array $form, array $files)
     {
-        $toSavefiles = FilesHelper::getFormattedToSafe($files);
-        $arSaveFiles = [];
-        if(!empty($toSavefiles)){
-            foreach($toSavefiles as $file){
-                $id_file = \CFile::SaveFile($file,'reviews');
-                if(str_starts_with($file['type'], 'video')){
-                    $thumbnail = $this->addThumbnail($id_file);
-                    $arSaveFiles['preview'] = [
-                        'file_array' => \CFile::MakeFileArray($thumbnail),
-                        'thumbnail_path' => $thumbnail
-                    ];
-                }
-                $arSaveFiles['ids'][] = $id_file;
-            }
-        }
-        return $arSaveFiles;
+        /** @var CreatorContract */
+        $creator = ServiceLocator::getInstance()->get(CreatorContract::class);
+        return $creator->create($form, $files);
     }
 
-    protected function addThumbnail(int $id_file)
+    public function sorting(array $sorting, array $pagination): array
     {
-        $path = tempnam(sys_get_temp_dir(), "img") . '.jpg';
-        $videoPath = $_SERVER['DOCUMENT_ROOT']. \CFile::GetPath($id_file);
-        $ffmpeg = \FFMpeg\FFMpeg::create();
-        $video = $ffmpeg->open($videoPath);
-        $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
-        $frame->save($path);
-        return $path;
+        $pagination['currentPage'] = 1;
+        return $this->loadElements($pagination, $sorting);
     }
 
-    /**
-     * @param string $form is json from array{eval: int, review: string, contact: string, user_name: string, offer: int}
-     * @param array $files from $_FILES
-     */
-    public function add($form, array $files)
+    public function pagination(array $pagination, array $sorting): array
     {
-        global $USER;
-        Loader::includeModule('iblock');
-        $form = Json::decode($form);
-        $uploadResult = [];
-
-        if(!empty($files)) $uploadResult = $this->uploadFiles($files);
-
-        $property = [
-            'PRODUCT' => $this->options->getProductId(),
-            'EVAL' => $form['eval'],
-            'REVIEW' => $form['review'],
-            'FILES' => $uploadResult['ids'],
-            'OFFER' => $form['offer'],
-            'CONTACT_DETAILS' => $form['contact']
-        ];
-
-        if($USER->IsAuthorized()){
-            $property['USER'] = $USER->GetID();
-            $lastName = !empty($USER->GetLastName())
-            ? mb_strtoupper(mb_strlen($USER->GetLastName()) === 1
-                ? $USER->GetLastName()
-                : mb_substr($USER->GetLastName(), 0, 1))
-            : '';
-
-            $property['USER_NAME'] = $USER->GetFirstName() . ' ' . $lastName . '.';
-        } else {
-            $property['USER_NAME'] = $form['user_name'];
-        }
-
-        $name = $this->options->getProductId() ? "Отзыв на товар - " . $this->options->getProductId() : 'Отзыв без товара от - ' . $property['USER_NAME'];
-
-        $data = [
-            "IBLOCK_ID" => $this->options->getIblockId(),
-            'NAME' => $name,
-            'IBLOCK_SECTION_ID' => false,
-            "ACTIVE" => 'N',
-            'PROPERTY_VALUES' => $property
-        ];
-
-        if($uploadResult['preview']) $data['PREVIEW_PICTURE'] = $uploadResult['preview']['file_array'];
-
-        $id = (new \CIBlockElement)->Add($data);
-
-        if($uploadResult['preview']['thumbnail_path']) unlink($uploadResult['preview']['thumbnail_path']);
-
-        return $id;
+        return $this->loadElements($pagination, $sorting);
     }
 
-    /**
-     * @param string $pagination is json
-     * @param string $sorting is json
-     */
-    public function sorting($sorting, $pagination): array
+    public function loadElements(array $pagination, array $sorting): array
     {
-        $result = [];
-        $pagination = Json::decode($pagination);
-        $sorting = Json::decode($sorting);
-
-        $this->options->setPaginationCurrent(1)
-                ->setPaginationPageCount($pagination['pageCount'])
-                ->setSorting($sorting['field'],$sorting['type']);
+        $this->options
+            ->setPaginationCurrent($pagination['currentPage'] ?? 1)
+            ->setPaginationPageCount($pagination['pageCount'] ?? 1)
+            ->setSorting($sorting['field'], $sorting['type']);
 
         $result = $this->getElements($this->options->getProductId());
         $result['pagination'] = $this->getPagination();
-        return $result;
-    }
 
-    /**
-     * @param string $pagination is json
-     * @param string $sorting is json
-     */
-    public function pagination($pagination, $sorting): array
-    {
-        $result = [];
-        $pagination = Json::decode($pagination);
-        $sorting = Json::decode($sorting);
-
-        $this->options->setPaginationCurrent($pagination['currentPage'])
-                ->setPaginationPageCount($pagination['pageCount'])
-                ->setSorting($sorting['field'], $sorting['type']);
-
-        $result = $this->getElements($this->options->getProductId());
-        $result['pagination'] = $this->getPagination();
         return $result;
     }
 }

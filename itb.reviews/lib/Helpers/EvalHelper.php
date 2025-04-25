@@ -1,7 +1,6 @@
 <?php
 namespace Itb\Reviews\Helpers;
 
-use Bitrix\Iblock\Elements\ElementProductReviewsApiTable;
 use Itb\Core\Helpers\LanguageHelper;
 use Itb\Reviews\Models\ReviewsTable;
 
@@ -17,7 +16,7 @@ class EvalHelper
     {
         static $collect = null;
         if($collect === null){
-            $collect = collect(ElementProductReviewsApiTable::query()
+            $collect = collect(ReviewsTable::query()
             ->where('PRODUCT_VALUE', $productId)
             ->where('ACTIVE','Y')
             ->setSelect(['PRODUCT_' => 'PRODUCT','EVAL_' =>'EVAL'])
@@ -71,7 +70,7 @@ class EvalHelper
 
     public static function countReviewsFormatted(int $count): string
     {
-        $text = LanguageHelper::getPlural($count, ['оценка', 'оценки', 'оценок']);
+        $text = LanguageHelper::getPlural($count, ['отзыва', 'отзыва', 'отзывов']);
         return "$count $text";
     }
 }

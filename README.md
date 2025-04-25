@@ -27,23 +27,25 @@ Itb\Reviews\Options::getInstance();
 Через $arParams можно прокинуть следующие параметры в компонент:
 
 - ```IBLOCK_ID``` - ИД инфоблока отзывов, по умолчанию будет взято значение из настроек модуля.
-- ```PRODUCT_ID``` (тип int) - ид продукта для которого будут выбраны отзывы, то есть в catalog.element передаете id
+- ```PRODUCT_ID``` (тип int) - ид продукта для которого будут выбраны отзывы, то есть в catalog.element передаете id, если id не передается то будут выбраны все отзывы
 - ```PAGINATION_LIMIT``` (тип int) - количество отзывов на странице
 - ```SHOW_INFO_PRODUCT``` (тип bool) - дополнительная информация о товаре на общей странице отзывов (название товара и ссылка на него + картинка товара (PREVIEW_PICTURE либо DETAIL_PICTURE))
+- ```PLATFORM``` (тип string) - C какой платформы доставать отзыв, по умолчанию пустая строка для выборки из всех платформ и 'site|2gis' для выборки с определенной.
 
 ## Пример подключения компонента
 
 1. Подключение на общей странице отзывов:
 ```php
 $APPLICATION->IncludeComponent(
-	"Itb:reviews", 
+	"itb:reviews", 
 	"about", 
 	[
 		"PAGINATION_LIMIT" => "5",
 		"SHOW_INFO_PRODUCT" => true,
 		"COMPONENT_TEMPLATE" => "about",
 		"CACHE_TYPE" => "A",
-		"CACHE_TIME" => "86400"
+		"CACHE_TIME" => "86400",
+		"PLATFORM" => "site|2gis|''"
 	],
 	false
 );
@@ -61,7 +63,7 @@ if (Loader::includeModule('api.uncachedarea') && Loader::includeModule('itb.revi
 файл ```/include/components/reviews.php```:
 ```php
 $APPLICATION->IncludeComponent(
-	"Itb:reviews", 
+	"itb:reviews", 
 	".default", 
 	[
 		"PRODUCT_ID" => $arParams["PRODUCT_ID"],
@@ -72,6 +74,31 @@ $APPLICATION->IncludeComponent(
 	false
 );
 ```
+
+## Импорт отзывов с других платформ
+Сейчас реализован импорт с 2gis.
+Для этого в настройках компонента заполните настройки:
+1. Api ключ 2гис, если не нашли, то исползуйте с стрраницы 2гис, можно через сеть посмотреть ключ в запросе к api или взять этот если еще работает - 6e7e1929-4ea9-4a5d-8c05-d601860389bd
+2. ID филиалов - каждый филиал вводить с новой строки
+
+Для импорта без ошибок необходима кодировка базы - utf8bd4
+
+проверить after_connect_d7: 
+```php
+$this->queryExecute("SET NAMES 'utf8mb4'");
+$this->queryExecute('SET collation_connection = "utf8mb4_unicode_ci"');
+```
+
+После этого проверить агента - ``` \Itb\Reviews\Agents\Import::exec(); ```, при установке модуля он выключен.
+
+Для импорта с других платформ наследуйтесь от класса ``` Itb\Reviews\Import\BaseImport ``` и реализуйте метод ``` process ``` в нем и должен быть реализован импорт. Для добавления отзывов в инфоблок используйте метод абстрактного класса ``` import ```, туда передается массив добовляемых отзывов, структуру можно посмотреть в классе ``` ImportFrom2Gis ```
+Внешний ид должен быть числом.
+
+После этого добавьте нового импортера в .settings.php модуля в секцию с регистрацией классов DI контейнере, на подобие с классом ``` ImportFrom2Gis ```
+
+И наконец можете добавть название вашего класса в массив ``` $importPlatformsMap ``` агента ``` Itb\Reviews\Agents\Import ```. Этот массив должен хранить названия классов наслдников ``` BaseImport ``` и соответственно каждый класс должен быть добавлен в DI контейнер.
+
+Так же не забудьте добавить код новой платформы в свойство ``` REVIEW_PLATFORM ``` инфоблока, xml_id соответствует значению перечесления класса ``` Itb\Reviews\Enum\Platforms ``` - туда так же нужно добавить новый кейс для вашей платформы.
 
 ## Vue компонент reviews-star
 
@@ -115,6 +142,7 @@ if (Loader::includeModule('itb.reviews')) {
 - ```PRODUCT_ID```
 - ```IBLOCK_ID```
 - ```SHOW_INFO_PRODUCT```
+- ```PLATFORM```
 
 Чтобы корректно использовать ajax запросы в шаблоне компонента, передавайте эти параметры в теле запроса под ключом ```params```
 

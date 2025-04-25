@@ -9,6 +9,7 @@ use Itb\Core\Helpers\DateHelper;
 use Itb\Reviews\Models\ReviewsTable;
 use Itb\Reviews\Options;
 use Illuminate\Support\Collection;
+use Itb\Reviews\Enum\Platforms;
 
 class Elements extends Resource
 {
@@ -41,10 +42,11 @@ class Elements extends Resource
                 'date' => DateHelper::getDateFormatted($item['DATE_CREATE']),
                 'offer_size' => null,
                 'user_name' => $item['USER_NAME_VALUE'],
-                'eval' => $item['EVAL_VALUE'],
+                'eval' => (float)$item['EVAL_VALUE'],
                 'files' => $files[$item['ID']] ? $files[$item['ID']] : [],
                 'review' => $review,
                 'store_response' => $store_response,
+                'platform' => Platforms::get($item['REVIEW_PLATFORM_VALUE'])->value
             ];
 
             if($item['PRODUCT_VALUE']){

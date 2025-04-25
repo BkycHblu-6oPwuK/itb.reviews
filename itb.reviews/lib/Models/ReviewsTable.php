@@ -25,12 +25,11 @@ class ReviewsTable extends ElementProductReviewsApiTable
         if (!$count) {
             $query = self::query()->where('ACTIVE', 'Y');
 
-            if($productId){
+            if ($productId) {
                 $query = $query->where('PRODUCT.VALUE', $productId);
             }
-            
-            $count = $query->countTotal(true)->exec()->getCount();
 
+            $count = $query->countTotal(true)->exec()->getCount();
         }
         return $count;
     }
@@ -40,7 +39,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
         $query = $query->setSelect(array_merge(
             $query->getSelect(),
             ['ID_FILE' => 'FILES.VALUE', 'PREVIEW_PICTURE', 'SRC_FILE', 'SRC_THUMBAIL', 'TYPE' => 'FILE.CONTENT_TYPE']
-            ))
+        ))
             ->registerRuntimeField('FILE', [
                 'data_type' => FileTable::class,
                 'reference' => [
@@ -83,7 +82,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
     public static function reviewsExistsByCurrentUserAndProductId(int $productId): bool
     {
         global $USER;
-        $userId = $USER->GetID();
+        $userId = $USER?->GetID();
         if (empty($userId)) {
             return false;
         }
@@ -99,7 +98,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
         return !empty($element['ID']);
     }
 
-    public static function getElements(int $productId, array $sorting, array $pagination, bool $getInfoByProduct)
+    public static function getElements(int $productId, array $sorting, array $pagination, bool $getInfoByProduct, string $platform = '') : array
     {
         $nav = new \Bitrix\Main\UI\PageNavigation("nav-reviews");
         $nav->allowAllRecords(true)
@@ -108,7 +107,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
 
         $elements = self::query();
 
-        if($productId){
+        if ($productId) {
             $elements = $elements->where('PRODUCT.VALUE', $productId);
         }
 
@@ -120,10 +119,14 @@ class ReviewsTable extends ElementProductReviewsApiTable
             'EVAL_VALUE' => 'EVAL.VALUE',
             'REVIEW_VALUE' => 'REVIEW.VALUE',
             'STORE_RESPONSE_VALUE' => 'STORE_RESPONSE.VALUE',
+            'REVIEW_PLATFORM_VALUE' => 'REVIEW_PLATFORM.ITEM.XML_ID'
         ];
 
-        if($getInfoByProduct) {
+        if ($getInfoByProduct) {
             $select = array_merge($select, ['PRODUCT_VALUE' => 'PRODUCT.VALUE']);
+        }
+        if ($platform) {
+            $elements->where('REVIEW_PLATFORM.ITEM.XML_ID', $platform);
         }
 
         $elements = $elements->where('ACTIVE', 'Y')
@@ -135,7 +138,7 @@ class ReviewsTable extends ElementProductReviewsApiTable
         return Elements::make(compact('elements'))->toArray();
     }
 
-    public static function getFilesForElements(array $idsElements)
+    public static function getFilesForElements(array $idsElements) : array
     {
         $elements = !empty($idsElements) ? self::addFileToQuery(self::query()
             ->setSelect(['ID'])
@@ -143,5 +146,17 @@ class ReviewsTable extends ElementProductReviewsApiTable
             ->exec()
             ->fetchAll() : [];
         return FilesForElements::make(compact('elements'))->toArray();
+    }
+
+    public static function reviewIsExistsByExternalIdAndPlatform(string $externalId, string $platform) : bool
+    {
+        $element = self::query()
+            ->setSelect(['ID'])
+            ->where('EXTERNAL_ID.VALUE', $externalId)
+            ->where('REVIEW_PLATFORM.ITEM.XML_ID', $platform)
+            ->exec()
+            ->fetch();
+
+        return !empty($element['ID']);
     }
 }

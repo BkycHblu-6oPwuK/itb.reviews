@@ -6,6 +6,7 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\Config\Option;
 use Itb\Core\Modules\Options\Fields\Input;
 use Itb\Core\Modules\Options\Fields\Select;
+use Itb\Core\Modules\Options\Fields\TextArea;
 use Itb\Core\Modules\Options\Tab;
 use Itb\Core\Modules\Options\TabsBuilder;
 
@@ -34,8 +35,11 @@ $mainTab = new Tab('edit1', 'Общие настройки', 'Отзывы');
 $mainTab->addField((new Select('reviews_iblock_id', 'Инфоблок', $optionsIblock))->setDefaultValue($selectedIblock)->setLabel('Общие'));
 $mainTab->addField((new Input('catalog_iblock_id', 'ID инфоблока каталога'))->setDefaultValue(0));
 $mainTab->addField((new Input('offers_iblock_id', 'ID инфоблока предложений'))->setDefaultValue(0));
-$accessTab = new Tab("edit2", Loc::getMessage("MAIN_TAB_RIGHTS"), Loc::getMessage("MAIN_TAB_TITLE_RIGHTS"));
-$tabsBuilder = (new TabsBuilder())->addTab($mainTab)->addTab($accessTab);
+$twoGisTab = new Tab('edit2', 'Импорт из 2гис', 'Импорт из 2гис');
+$twoGisTab->addField((new Input('two_gis_key', 'Api ключ 2гис')));
+$twoGisTab->addField((new TextArea('two_gis_branches', 'ID филиалов (вводить каждый филиал с новой строки)')));
+$accessTab = new Tab("edit3", Loc::getMessage("MAIN_TAB_RIGHTS"), Loc::getMessage("MAIN_TAB_TITLE_RIGHTS"));
+$tabsBuilder = (new TabsBuilder())->addTab($mainTab)->addTab($twoGisTab)->addTab($accessTab);
 
 $tabs = $tabsBuilder->getTabs();
 

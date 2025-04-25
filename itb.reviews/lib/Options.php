@@ -1,9 +1,11 @@
 <?php
+
 namespace Itb\Reviews;
 
+use Itb\Reviews\Enum\Platforms;
 use Itb\Reviews\Exceptions\CatalogIblockIdIsEmpty;
 
-final class Options 
+final class Options
 {
     const MODULE_ID = 'itb.reviews';
 
@@ -18,11 +20,12 @@ final class Options
     private $pagination_page_count = 0;
     private $sorting_field = "ID";
     private $sorting_type = "DESC";
+    private $platform;
 
     private $limitFiles = 20;
     private $showFilesByProduct = false;
     private static $instance = null;
-    
+
     private function __construct(array $arParams)
     {
         $moduleOptions = \Bitrix\Main\Config\Option::getForModule(self::MODULE_ID);
@@ -30,9 +33,14 @@ final class Options
         $this->product_id = $arParams['PRODUCT_ID'] ? (int)$arParams['PRODUCT_ID'] : 0;
         $this->pagination_limit = $arParams['PAGINATION_LIMIT'] ? (int)$arParams['PAGINATION_LIMIT'] : 5;
         $this->showInfoByProduct = $arParams['SHOW_INFO_PRODUCT'] ? (bool)$arParams['SHOW_INFO_PRODUCT'] : false;
+        $this->platform = $arParams['PLATFORM'] ? Platforms::get($arParams['PLATFORM'] ?? '')->value : '';
 
-        if(empty($moduleOptions['catalog_iblock_id'])) throw new CatalogIblockIdIsEmpty("Должна быть заполнена настройка модуля - ID инфоблока каталога");
-        
+        if($this->platform !== Platforms::SITE->value){
+            $this->sorting_field = 'EXTERNAL_ID.VALUE';
+        }
+
+        if (empty($moduleOptions['catalog_iblock_id'])) throw new CatalogIblockIdIsEmpty("Должна быть заполнена настройка модуля - ID инфоблока каталога");
+
         $this->catalogIblockId = $moduleOptions['catalog_iblock_id'] ? (int)$moduleOptions['catalog_iblock_id'] : 0;
         $this->offerIblockId = $moduleOptions['offers_iblock_id'] ? (int)$moduleOptions['offers_iblock_id'] : 0;
     }
@@ -45,17 +53,17 @@ final class Options
     /**
      * @throws CatalogIblockIdIsEmpty
      */
-    public static function createInstance(array $arParams) : self
+    public static function createInstance(array $arParams): self
     {
         self::$instance = new self($arParams);
         return self::$instance;
     }
 
-    /**
-     * Возвращает объект, если он уже был создан, или null
-     */
-    public static function getInstance() : ?self
-    {   
+    public static function getInstance() : self
+    {
+        if(!self::$instance){
+            return self::createInstance([]);
+        }
         return self::$instance;
     }
 
@@ -87,7 +95,7 @@ final class Options
     {
         return $this->pagination_page_count;
     }
-    
+
     public function getShowInfoProduct()
     {
         return $this->showInfoByProduct;
@@ -155,5 +163,21 @@ final class Options
     public function getOffersIblockId()
     {
         return $this->offerIblockId;
+    }
+    public function getPlatform()
+    {
+        return $this->platform;
+    }
+
+    public function getTwoGisKey(): string
+    {
+        return \Bitrix\Main\Config\Option::get(self::MODULE_ID, 'two_gis_key');
+    }
+
+    public function getTwoGisBranches(): array
+    {
+        $branches = preg_split("/\r\n|\n|\r/", \Bitrix\Main\Config\Option::get(self::MODULE_ID, 'two_gis_branches')) ?: [];
+        $branches = array_unique(array_filter(array_map('trim', $branches)));
+        return $branches;
     }
 }

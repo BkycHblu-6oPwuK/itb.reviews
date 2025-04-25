@@ -9,6 +9,8 @@ use Bitrix\Main\Application;
 use Bitrix\Main\Loader;
 use Bitrix\Iblock\TypeTable;
 use Bitrix\Iblock\IblockTable;
+use Bitrix\Main\Context;
+use Itb\Reviews\Enum\Platforms;
 
 Loc::loadMessages(__FILE__);
 
@@ -24,7 +26,7 @@ class itb_reviews extends CModule
             $this->MODULE_VERSION_DATE = $arModuleVersion['VERSION_DATE'];
             $this->MODULE_NAME         = Loc::getMessage('REVIEWS_NAME');
             $this->MODULE_DESCRIPTION  = Loc::getMessage('REVIEWS_DESCRIPTION');
-            $this->PARTNER_NAME = 'itb';
+            $this->PARTNER_NAME = 'Itb';
             $this->PARTNER_URI = '#';
         } else {
             CAdminMessage::showMessage(
@@ -39,16 +41,13 @@ class itb_reviews extends CModule
             $context = Application::getInstance()->getContext();
             $request = $context->getRequest();
             $step = $request->get('step');
-            // глобальная переменная с обстрактным классом
             global $APPLICATION;
-            // проверяем какой сейчас шаг, если он не существует или меньше 2, то выводим первый шаг установки
             if ($step < 2) {
                 $APPLICATION->IncludeAdminFile(
                     Loc::getMessage('INSTALL_TITLE_STEP_1'),
                     __DIR__ . '/instalInfo-step1.php'
                 );
             }
-            // проверяем какой сейчас шаг, усли 2, производим установку
             if ($step == 2) {
                 $this->installFiles();
                 ModuleManager::registerModule($this->MODULE_ID);
@@ -57,7 +56,7 @@ class itb_reviews extends CModule
                     $this->createIblock($catalog, $request->get('offer') ?? 0);
                 }
                 $APPLICATION->IncludeAdminFile(
-                    Loc::getMessage('REVIEWS_INSTALL_TITLE') . ' «'.Loc::getMessage('REVIEWS_NAME').'»',
+                    Loc::getMessage('REVIEWS_INSTALL_TITLE') . ' «' . Loc::getMessage('REVIEWS_NAME') . '»',
                     __DIR__ . '/instalInfo-step2.php'
                 );
             }
@@ -68,6 +67,17 @@ class itb_reviews extends CModule
             return;
         }
         return true;
+    }
+
+    public function installAgents(): void
+    {
+        CAgent::Add([
+           "NAME" => '\Itb\Reviews\Agents\Import::exec();',
+           "MODULE_ID" => $this->MODULE_ID,
+           "IS_PERIOD" => "N",
+           "AGENT_INTERVAL" => 86400 * 30,
+           "ACTIVE" => "N",
+        ]);
     }
 
     public function installFiles()
@@ -100,7 +110,7 @@ class itb_reviews extends CModule
         $iblockId = $this->getIblockId($iblockCode);
         if (!$iblockId) {
             $iblock_type = TypeTable::query()->setSelect(['ID'])->fetch()['ID'];
-            $siteId = 's1';
+            $siteId = Context::getCurrent()->getSite() ?: 's1';
             $iblockData = [
                 'NAME' => 'Отзывы к товарам',
                 'CODE' => $iblockCode,
@@ -192,8 +202,35 @@ class itb_reviews extends CModule
                     'PROPERTY_TYPE' => 'S',
                     'MULTIPLE' => 'N',
                 ],
+                [
+                    'IBLOCK_ID' => $iblockId,
+                    'NAME' => 'Внешний id',
+                    'CODE' => 'EXTERNAL_ID',
+                    'PROPERTY_TYPE' => 'N',
+                    'MULTIPLE' => 'N',
+                ],
             ];
             PropertyTable::addMulti($propertyDataMap);
+            $propertyId = (new CIBlockProperty)->Add([
+                'IBLOCK_ID' => $iblockId,
+                'NAME' => 'Платформа отзыва',
+                'CODE' => 'REVIEW_PLATFORM',
+                'PROPERTY_TYPE' => 'L',
+                'MULTIPLE' => 'N',
+            ]);
+            if ($propertyId) {
+                CIBlockPropertyEnum::Add([
+                    'PROPERTY_ID' => $propertyId,
+                    'XML_ID' => Platforms::SITE->value,
+                    'VALUE' => 'Отзыв с сайта',
+                ]);
+
+                CIBlockPropertyEnum::Add([
+                    'PROPERTY_ID' => $propertyId,
+                    'XML_ID' => Platforms::TWO_GIS->value,
+                    'VALUE' => 'Отзыв c 2gis',
+                ]);
+            }
         }
         Option::set($this->MODULE_ID, 'reviews_iblock_id', $iblockId);
         Option::set($this->MODULE_ID, 'catalog_iblock_id', $catalog);
@@ -212,7 +249,8 @@ class itb_reviews extends CModule
         global $APPLICATION;
 
         $this->uninstallFiles();
-
+        CAgent::RemoveModuleAgents($this->MODULE_ID);
+        Option::delete($this->MODULE_ID);
         ModuleManager::unRegisterModule($this->MODULE_ID);
 
         $APPLICATION->includeAdminFile(
@@ -223,9 +261,8 @@ class itb_reviews extends CModule
 
     public function uninstallFiles()
     {
-        DeleteDirFilesEx("/bitrix/components/itb/reviews");
+        DeleteDirFilesEx("/bitrix/components/Itb/reviews");
         DeleteDirFilesEx("/bitrix/js/itb/reviews");
         DeleteDirFilesEx("/images/reviews");
-        Option::delete($this->MODULE_ID);
     }
 }

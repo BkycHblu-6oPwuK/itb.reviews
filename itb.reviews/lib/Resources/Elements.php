@@ -46,7 +46,7 @@ class Elements extends Resource
                 'files' => $files[$item['ID']] ? $files[$item['ID']] : [],
                 'review' => $review,
                 'store_response' => $store_response,
-                'platform' => Platforms::get($item['REVIEW_PLATFORM_VALUE'])->value
+                'platform' => Platforms::get($item['REVIEW_PLATFORM_VALUE'] ?? '')->value
             ];
 
             if($item['PRODUCT_VALUE']){

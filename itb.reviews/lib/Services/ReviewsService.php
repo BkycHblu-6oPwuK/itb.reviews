@@ -4,25 +4,26 @@ namespace Itb\Reviews\Services;
 
 use Bitrix\Main\DI\ServiceLocator;
 use Itb\Core\Helpers\PaginationHelper;
+use Itb\Reviews\ComponentParams;
 use Itb\Reviews\Contracts\CreatorContract;
-use Itb\Reviews\Helpers\EvalHelper;
+use Itb\Reviews\EvalHelper;
 use Itb\Reviews\Models\ReviewsTable;
 use Itb\Reviews\Options;
 
 class ReviewsService
 {
-    protected Options $options;
-    protected bool $isImport;
+    protected readonly Options $options;
+    protected readonly ComponentParams $componentParams;
 
-    public function __construct(Options $options, bool $isImport = false)
+    public function __construct(ComponentParams $componentParams)
     {
-        $this->options = $options;
-        $this->isImport = $isImport;
+        $this->options = Options::getInstance();
+        $this->componentParams = $componentParams;
     }
 
     public function getReviews(): array
     {
-        $productId = $this->options->getProductId();
+        $productId = $this->componentParams->productId;
 
         $this->updatePaginationCount($productId);
 
@@ -52,8 +53,8 @@ class ReviewsService
 
         if ($withEvalAndFiles) {
             $elements['eval_info'] = EvalHelper::getEvalInfo($productId);
-            $elements['files'] = $this->options->getShowFilesByProduct()
-                ? ReviewsTable::getFiles($productId, $this->options->getLimitFiles())
+            $elements['files'] = $this->componentParams->showFilesByProduct
+                ? ReviewsTable::getFiles($productId, $this->componentParams->limitFiles)
                 : [];
         }
 
@@ -63,22 +64,22 @@ class ReviewsService
     protected function updatePaginationCount(int $productId): void
     {
         $count = ReviewsTable::getCountReviews($productId);
-        $limit = $this->options->getPaginationLimit();
-        $this->options->setPaginationPageCount(ceil($count / $limit));
+        $limit = $this->componentParams->paginationLimit;
+        $this->componentParams->setPaginationPageCount(ceil($count / $limit));
     }
 
     public function getElements(int $productId)
     {
-        return ReviewsTable::getElements($productId, $this->options->getSorting(), $this->options->getPagination(), $this->options->getShowInfoProduct(), $this->options->getPlatform());
+        return ReviewsTable::getElements($productId, $this->componentParams->getSorting(), $this->componentParams->getPagination(), $this->componentParams->showInfoByProduct, $this->componentParams->platform);
     }
 
     protected function getPagination()
     {
-        $current = $this->options->getPaginationCurrent();
-        $count =  $this->options->getPaginationPageCount();
+        $current = $this->componentParams->paginationCurrent;
+        $count =  $this->componentParams->paginationPageCount;
         return [
             'currentPage' => $current,
-            'limit' => $this->options->getPaginationLimit(),
+            'limit' => $this->componentParams->paginationLimit,
             'pageCount' => $count,
             'pages' => PaginationHelper::getPages($current, $count),
         ];
@@ -87,8 +88,8 @@ class ReviewsService
     protected function getSorting()
     {
         return [
-            'field' => $this->options->getSortingField(),
-            'type' => $this->options->getSortingType(),
+            'field' => $this->componentParams->sortingField,
+            'type' => $this->componentParams->sortingType,
         ];
     }
 
@@ -107,7 +108,7 @@ class ReviewsService
     {
         /** @var CreatorContract */
         $creator = ServiceLocator::getInstance()->get(CreatorContract::class);
-        return $creator->create($form, $files);
+        return $creator->create($form, $files, $this->componentParams);
     }
 
     public function sorting(array $sorting, array $pagination): array
@@ -123,12 +124,12 @@ class ReviewsService
 
     public function loadElements(array $pagination, array $sorting): array
     {
-        $this->options
+        $this->componentParams
             ->setPaginationCurrent($pagination['currentPage'] ?? 1)
             ->setPaginationPageCount($pagination['pageCount'] ?? 1)
             ->setSorting($sorting['field'], $sorting['type']);
 
-        $result = $this->getElements($this->options->getProductId());
+        $result = $this->getElements($this->componentParams->productId);
         $result['pagination'] = $this->getPagination();
 
         return $result;

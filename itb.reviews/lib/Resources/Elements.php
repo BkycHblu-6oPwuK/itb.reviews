@@ -62,7 +62,7 @@ class Elements extends Resource
     protected function getInfoByProducts(array $productIds)
     {
         $options = Options::getInstance();
-        $catalogApi = Iblock::wakeUp($options->getCatalogIblockId())->getEntityDataClass();
+        $catalogApi = Iblock::wakeUp($options->catalogIblockId)->getEntityDataClass();
         if(!$catalogApi) throw new Exception("Не заполнен символьный код API инфоблока каталог товаров");
         $result = new Collection($catalogApi::query()
         ->setSelect([

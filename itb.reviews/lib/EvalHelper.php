@@ -1,5 +1,5 @@
 <?php
-namespace Itb\Reviews\Helpers;
+namespace Itb\Reviews;
 
 use Itb\Core\Helpers\LanguageHelper;
 use Itb\Reviews\Models\ReviewsTable;

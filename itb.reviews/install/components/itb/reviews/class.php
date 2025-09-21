@@ -4,6 +4,7 @@ use Bitrix\Main\Loader;
 use Itb\Reviews\Options;
 use Itb\Reviews\Services\ReviewsService;
 use \Bitrix\Main\Application;
+use Itb\Reviews\ComponentParams;
 
 class Reviews extends \CBitrixComponent
 {
@@ -11,8 +12,8 @@ class Reviews extends \CBitrixComponent
     {
         if(Loader::includeModule('itb.reviews')){
             global $USER;
-            $options = Options::createInstance($this->arParams);
-            $service = new ReviewsService($options);
+            $componentParams = new ComponentParams($this->arParams);
+            $service = new ReviewsService($componentParams);
             $auth = $USER->IsAuthorized();
             $taggedCache = Application::getInstance()->getTaggedCache();
             $cache_path = 'itb/reviews';
@@ -20,7 +21,7 @@ class Reviews extends \CBitrixComponent
                 $taggedCache->startTagCache($cache_path);
                 $this->arResult = $service->getReviews();
                 $this->includeComponentTemplate();
-                $taggedCache->registerTag('iblock_id_' . $options->getIblockId());
+                $taggedCache->registerTag('iblock_id_' . Options::getInstance()->reviewsIblockId);
                 $taggedCache->endTagCache();
             }
         }

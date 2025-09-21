@@ -3,7 +3,6 @@ namespace Itb\Reviews\Controllers;
 
 use Bitrix\Main\Engine\Controller;
 use Bitrix\Main\Request;
-use Itb\Reviews\Options;
 use Itb\Reviews\Services\ReviewsService;
 
 abstract class BaseController extends Controller
@@ -22,8 +21,8 @@ abstract class BaseController extends Controller
         if(!empty($product_id)){
             $params['PRODUCT_ID'] = $product_id;
         }
-
-        $this->service = new ReviewsService(Options::createInstance($params));
+        $componentParams = new \Itb\Reviews\ComponentParams($params);
+        $this->service = new ReviewsService($componentParams);
     }
 
     public function getDefaultPreFilters(): array

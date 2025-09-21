@@ -1,5 +1,7 @@
 <?php
 
+use Itb\Reviews\ComponentParams;
+
 return [
 	'controllers' => [
 		'value' => [
@@ -13,14 +15,11 @@ return [
 				'className' => \Itb\Reviews\Import\ImportFrom2Gis::class,
 				'constructorParams' => static function (){
 					$options = \Itb\Reviews\Options::getInstance();
-					return [new \Itb\Reviews\Services\ReviewsService($options), $options->getTwoGisBranches(), $options->getTwoGisKey()];
+					return [new \Itb\Reviews\Services\ReviewsService(new ComponentParams()), $options->twoGisBranches, $options->twoGisKey];
 				}
 			],
 			\Itb\Reviews\Contracts\CreatorContract::class => [
 				'className' => Itb\Reviews\Services\ReviewCreatorService::class,
-				'constructorParams' => static function (){
-					return [\Itb\Reviews\Options::getInstance()];
-				}
 			],
 			\Itb\Reviews\Contracts\FileUploaderContract::class => [
 				'className' => Itb\Reviews\Services\UploadService::class,

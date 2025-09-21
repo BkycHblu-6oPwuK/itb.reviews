@@ -4,6 +4,7 @@ namespace Itb\Reviews\Services;
 
 use Bitrix\Main\DI\ServiceLocator;
 use Itb\Core\Helpers\IblockHelper;
+use Itb\Reviews\ComponentParams;
 use Itb\Reviews\Contracts\CreatorContract;
 use Itb\Reviews\Contracts\FileUploaderContract;
 use Itb\Reviews\Enum\Platforms;
@@ -13,24 +14,24 @@ class ReviewCreatorService implements CreatorContract
 {
     protected Options $options;
 
-    public function __construct(Options $options)
+    public function __construct()
     {
-        $this->options = $options;
+        $this->options = Options::getInstance();
         \Bitrix\Main\Loader::includeModule('iblock');
     }
 
-    public function create(array $form, array $files): int
+    public function create(array $form, array $files, ComponentParams $params): int
     {
         global $USER;
 
         $form['eval'] = $this->sanitizeEval($form['eval'] ?? 1);
         $uploadResult = $this->handleFiles($files);
 
-        $properties = $this->buildProperties($form, $uploadResult, $USER);
-        $name = $this->buildName($form, $properties);
+        $properties = $this->buildProperties($form, $uploadResult, $USER, $params);
+        $name = $this->buildName($form, $properties, $params);
 
         $elementData = [
-            'IBLOCK_ID' => $this->options->getIblockId(),
+            'IBLOCK_ID' => $this->options->reviewsIblockId,
             'NAME' => $name,
             'IBLOCK_SECTION_ID' => false,
             'ACTIVE' => $form['active'] ? 'Y' : 'N',
@@ -66,14 +67,14 @@ class ReviewCreatorService implements CreatorContract
         return $result;
     }
 
-    protected function buildProperties(array $form, array $uploadResult, $USER): array
+    protected function buildProperties(array $form, array $uploadResult, $USER, ComponentParams $params): array
     {
         $platform = Platforms::get($form['platform'] ?? '');
         $isAuth = $USER?->IsAuthorized() ?? false;
         $isSitePlatform = ($platform === Platforms::SITE);
         $userId = $isAuth ? $USER->GetID() : null;
         $properties = [
-            'PRODUCT' => $this->options->getProductId(),
+            'PRODUCT' => $params->productId,
             'EVAL' => $form['eval'],
             'REVIEW' => $form['review'],
             'FILES' => $uploadResult['ids'],
@@ -106,13 +107,13 @@ class ReviewCreatorService implements CreatorContract
         return trim($USER?->GetFirstName() ?? '' . ' ' . $initial);
     }
 
-    protected function buildName(array $form, array $properties): string
+    protected function buildName(array $form, array $properties, ComponentParams $params): string
     {
         if (($form['platform'] ?? '') === Platforms::TWO_GIS->value) {
             return 'Отзыв c 2гис - ' . ($form['user_name'] ?? 'Неизвестный');
         }
 
-        $productId = $this->options->getProductId();
+        $productId = $params->productId;
         if ($productId) {
             return 'Отзыв на товар - ' . $productId;
         }
@@ -122,7 +123,7 @@ class ReviewCreatorService implements CreatorContract
 
     protected function getPlatformId(Platforms $platform): int
     {
-        $propId = IblockHelper::getIblockPropIdByCode('REVIEW_PLATFORM', $this->options->getIblockId());
+        $propId = IblockHelper::getIblockPropIdByCode('REVIEW_PLATFORM', $this->options->reviewsIblockId);
         return IblockHelper::getEnumValues($propId, [$platform->value])[$platform->value]['id'];
     }
 }

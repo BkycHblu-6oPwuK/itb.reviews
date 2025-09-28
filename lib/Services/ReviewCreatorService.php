@@ -69,7 +69,7 @@ class ReviewCreatorService implements CreatorContract
 
     protected function buildProperties(array $form, array $uploadResult, $USER, ComponentParams $params): array
     {
-        $platform = Platforms::get($form['platform'] ?? '');
+        $platform = Platforms::tryFrom($form['platform'] ?? '') ?? Platforms::SITE;
         $isAuth = $USER?->IsAuthorized() ?? false;
         $isSitePlatform = ($platform === Platforms::SITE);
         $userId = $isAuth ? $USER->GetID() : null;

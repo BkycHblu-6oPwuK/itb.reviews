@@ -24,9 +24,7 @@ final class ComponentParams
         $this->productId         = (int)($params['PRODUCT_ID'] ?? 0);
         $this->paginationLimit   = (int)($params['PAGINATION_LIMIT'] ?? 5);
         $this->showInfoByProduct = (bool)($params['SHOW_INFO_PRODUCT'] ?? false);
-        $this->platform          = $params['PLATFORM']
-            ? Platforms::get($params['PLATFORM'])->value
-            : Platforms::SITE->value;
+        $this->platform          = Platforms::tryFrom($params['PLATFORM'] ?? '')?->value ?? Platforms::SITE->value;
 
         if ($this->platform !== Platforms::SITE->value) {
             $this->sortingField = 'EXTERNAL_ID.VALUE';

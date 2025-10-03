@@ -1,16 +1,19 @@
 {
-  "extra": {
-    "bitrix-dir": "bitrix"
-  },
-  "require": {
-    "php": "~8.2.0",
-    "php-ffmpeg/php-ffmpeg": "^1.2",
-    "illuminate/collections": "^11.29",
-    "symfony/var-dumper": "^7.1"
-  },
-  "config": {
-    "allow-plugins": {
-      "composer/installers": true
-    }
-  }
+    "name": "beeralex/itb.reviews",
+    "description": "My reviews module",
+    "type": "bitrix-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexandr Belotsitsko",
+            "email": "sanyabelyy020@gmail.com"
+        }
+    ],
+    "require": {
+        "beeralex/itb.core": "^1.0",
+        "php-ffmpeg/php-ffmpeg": "^1.2",
+        "illuminate/collections": "^11.29"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

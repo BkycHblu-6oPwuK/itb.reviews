@@ -1,0 +1,19 @@
+{
+    "name": "beeralex/beeralex.reviews",
+    "description": "My reviews module",
+    "type": "bitrix-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexandr Belotsitsko",
+            "email": "sanyabelyy020@gmail.com"
+        }
+    ],
+    "require": {
+        "beeralex/beeralex.core": "~1.0",
+        "php-ffmpeg/php-ffmpeg": "^1.2",
+        "illuminate/collections": "^11.29"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

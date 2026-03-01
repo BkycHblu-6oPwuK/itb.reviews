@@ -35,7 +35,7 @@ abstract class BaseImport
                 $this->service->add($item['form'], $item['files'] ?? []);
                 $this->removeFiles($item['tmp_paths'] ?? []);
             } catch (\Throwable $e) {
-                $this->logError($e, $item);
+                //$this->logError($e, $item);
             }
         }
     }
@@ -102,10 +102,5 @@ abstract class BaseImport
         $result['files']['error'][] = $file['error'];
         $result['files']['size'][] = $file['size'];
         $result['tmp_paths'][] = $file['tmp_name'];
-    }
-
-    protected function logError(\Throwable $e, $item): void
-    {
-        (new \Beeralex\Core\Logger\FileLogger(__DIR__ . '/../../logs/import_error.log'))->error($e->getMessage(), $item);
     }
 }
